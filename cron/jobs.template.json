@@ -1,0 +1,166 @@
+[
+  {
+    "_comment": "Replace {{TELEGRAM_CHAT_ID}} with your numeric Telegram chat ID throughout this file",
+    "id": "nightly-briefing",
+    "name": "Nightly Ops Briefing",
+    "enabled": true,
+    "schedule": "0 22 * * *",
+    "agent": "main",
+    "sessionTarget": "isolated",
+    "sessionKey": "nightly-briefing",
+    "timeoutSeconds": 300,
+    "payload": {
+      "model": "opencode-go/minimax-m2.5",
+      "message": "Run the nightly briefing. Read workspace/MEMORY.md and memory/$(date +%Y-%m-%d).md for context. Report: (1) what was accomplished today, (2) what's pending or blocked, (3) tomorrow's priorities, (4) any alerts or reminders. Keep it concise — bullet points. Send to Telegram."
+    },
+    "delivery": {
+      "type": "announce",
+      "channel": "telegram",
+      "target": "{{TELEGRAM_CHAT_ID}}"
+    }
+  },
+  {
+    "id": "morning-briefing",
+    "name": "Business Opening Report",
+    "enabled": true,
+    "schedule": "0 8 * * 1-5",
+    "agent": "main",
+    "sessionTarget": "isolated",
+    "sessionKey": "morning-briefing",
+    "timeoutSeconds": 300,
+    "payload": {
+      "model": "opencode-go/minimax-m2.5",
+      "message": "Good morning briefing. Check workspace/OPERATIONS.md for standing priorities. Report: (1) today's focus areas, (2) any cron jobs or tasks scheduled today, (3) one insight or learning from recent work. Short and energizing. Send to Telegram."
+    },
+    "delivery": {
+      "type": "announce",
+      "channel": "telegram",
+      "target": "{{TELEGRAM_CHAT_ID}}"
+    }
+  },
+  {
+    "id": "linkedin-daily-post",
+    "name": "LinkedIn Daily Draft",
+    "enabled": true,
+    "schedule": "0 9 * * 1-5",
+    "agent": "cowork",
+    "sessionTarget": "isolated",
+    "sessionKey": "linkedin-content",
+    "timeoutSeconds": 600,
+    "payload": {
+      "model": "opencode-go/glm-5",
+      "message": "Route to content-desk: Draft today's LinkedIn post. Theme: professional insights, lessons learned, industry perspective. Read workspace/MEMORY.md for context about our work and personality. Save draft to workspace/drafts/linkedin-$(date +%Y-%m-%d).md using this format:\n\n---\ndate: $(date +%Y-%m-%d)\ntarget: personal\nstatus: pending\n---\n\n[Post text here — 150-300 words, conversational, authentic, no hashtag spam, max 3 relevant hashtags]\n\n---\nMEDIA BRIEF:\n- [Visual direction]\n- [Color/style]\n- [Text overlay suggestion]\n\nThen message Telegram {{TELEGRAM_CHAT_ID}}: 'Your LinkedIn draft for today is ready. Reply: post | post bijou | post both | edit: [feedback] | skip'\n\nInclude the full draft text in the Telegram message."
+    },
+    "delivery": {
+      "type": "announce",
+      "channel": "telegram",
+      "target": "{{TELEGRAM_CHAT_ID}}"
+    }
+  },
+  {
+    "id": "daily-memory-curator",
+    "name": "Daily Memory Curator",
+    "enabled": true,
+    "schedule": "0 23 * * *",
+    "agent": "main",
+    "sessionTarget": "isolated",
+    "sessionKey": "memory-curation",
+    "timeoutSeconds": 300,
+    "payload": {
+      "model": "opencode-go/minimax-m2.5",
+      "message": "End of day memory curation. Read today's session notes from workspace/memory/$(date +%Y-%m-%d).md. Extract: (1) decisions made, (2) new patterns learned, (3) errors and fixes, (4) rules that should be permanent. Update workspace/MEMORY.md if new facts are worth keeping long-term (keep under 200 lines). Run 'brv curate \"<insight>\"' for anything cross-session useful. Reply NO_REPLY when done."
+    }
+  },
+  {
+    "id": "weekly-memory-compaction",
+    "name": "Weekly Memory Compaction",
+    "enabled": true,
+    "schedule": "0 2 * * 0",
+    "agent": "main",
+    "sessionTarget": "isolated",
+    "sessionKey": "memory-compaction",
+    "timeoutSeconds": 600,
+    "payload": {
+      "model": "opencode-go/minimax-m2.5",
+      "message": "Weekly memory compaction. Route to memory-desk agent. Tasks: (1) Read all memory files from the past week in workspace/memory/. (2) Deduplicate and compress workspace/MEMORY.md — must stay under 200 lines. (3) Archive week's daily notes to workspace/memory/archive/YYYY-WW/. (4) Update workspace/.learnings/LEARNINGS.md with any new reusable lessons. (5) Confirm compaction complete. Reply NO_REPLY when done."
+    }
+  },
+  {
+    "id": "agent-doctor",
+    "name": "Agent Doctor Health Check",
+    "enabled": true,
+    "schedule": "0 6 * * 0",
+    "agent": "main",
+    "sessionTarget": "isolated",
+    "sessionKey": "agent-doctor",
+    "timeoutSeconds": 300,
+    "payload": {
+      "model": "opencode-go/minimax-m2.5",
+      "message": "Run the agent health check: bash workspace/scripts/doctor.sh. Send the summary report to Telegram {{TELEGRAM_CHAT_ID}} — include pass count, warning count, failure count, and list any failures requiring attention."
+    },
+    "delivery": {
+      "type": "announce",
+      "channel": "telegram",
+      "target": "{{TELEGRAM_CHAT_ID}}"
+    }
+  },
+  {
+    "id": "weekly-cost-report",
+    "name": "Weekly Cost Report",
+    "enabled": true,
+    "schedule": "0 9 * * 1",
+    "agent": "main",
+    "sessionTarget": "isolated",
+    "sessionKey": "cost-report",
+    "timeoutSeconds": 180,
+    "payload": {
+      "model": "opencode-go/minimax-m2.5",
+      "message": "Generate the weekly cost report: bash workspace/scripts/cost-tracker.sh report. Send the summary table to Telegram {{TELEGRAM_CHAT_ID}}. Highlight any models or agents with unusually high costs. Reply NO_REPLY after sending."
+    },
+    "delivery": {
+      "type": "announce",
+      "channel": "telegram",
+      "target": "{{TELEGRAM_CHAT_ID}}"
+    }
+  },
+  {
+    "_comment": "Enable this if you use the persona/digital-twin agent for autonomous work",
+    "id": "persona-morning-tasks",
+    "name": "Persona Morning Tasks",
+    "enabled": false,
+    "schedule": "0 7 * * 1-5",
+    "agent": "persona",
+    "sessionTarget": "isolated",
+    "sessionKey": "persona-daily",
+    "timeoutSeconds": 1800,
+    "payload": {
+      "model": "opencode-go/glm-5",
+      "message": "Morning autonomous work session. Check workspace/persona/TASKS.md for priority queue. Execute top 3 tasks: content creation, outreach, or research. Log all actions to workspace/persona/logs/$(date +%Y-%m-%d).md. Report results to Telegram."
+    },
+    "delivery": {
+      "type": "announce",
+      "channel": "telegram",
+      "target": "{{TELEGRAM_CHAT_ID}}"
+    }
+  },
+  {
+    "_comment": "Enable this if you use the employer (bold-ops) agent",
+    "id": "employer-morning-brief",
+    "name": "Employer Morning Brief",
+    "enabled": false,
+    "schedule": "0 8 * * 1-5",
+    "agent": "bold-ops",
+    "sessionTarget": "isolated",
+    "sessionKey": "employer-brief",
+    "timeoutSeconds": 300,
+    "payload": {
+      "model": "opencode-go/minimax-m2.5",
+      "message": "Morning employer workspace brief. Check workspace/bold-business/OPERATIONS.md. Report today's employer priorities. Send to Telegram {{TELEGRAM_CHAT_ID}}."
+    },
+    "delivery": {
+      "type": "announce",
+      "channel": "telegram",
+      "target": "{{TELEGRAM_CHAT_ID}}"
+    }
+  }
+]

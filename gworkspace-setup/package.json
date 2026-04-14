@@ -1,0 +1,27 @@
+{
+  "name": "bb-workspace-setup",
+  "version": "1.0.0",
+  "description": "One-command Google Workspace setup for OpenClaw business teams. Installs and authenticates Gmail, Drive, Calendar for all team members.",
+  "main": "index.js",
+  "bin": {
+    "bb-workspace-setup": "./index.js",
+    "bb-workspace": "./index.js"
+  },
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": ["openclaw", "google-workspace", "setup", "automation"],
+  "author": "{{YOUR_COMPANY}}",
+  "license": "MIT",
+  "dependencies": {
+    "inquirer": "^9.2.12",
+    "chalk": "^5.3.0",
+    "googleapis": "^140.0.0",
+    "ora": "^8.0.1",
+    "open": "^10.1.0",
+    "fs-extra": "^11.2.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

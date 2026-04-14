@@ -1,0 +1,61 @@
+# Environment and secrets — NEVER commit these
+.env
+*.env
+.env.local
+.env.production
+
+# Service account and credential files
+*service-account*.json
+*credentials*.json
+*google-service-account*.json
+googlechat-service-account.json
+google-workspace.json
+
+# OpenClaw runtime files
+openclaw.json
+config/mcporter.json
+cron/jobs.json
+agents/*/agent/
+agents/**/agent/
+
+# API configs with real keys
+workspace/config/postiz.json
+
+# Generated workspace files
+workspace/memory/
+workspace/drafts/
+workspace/logs/
+workspace/ops/
+workspace/outputs/
+workspace/.learnings/
+
+# Node modules
+node_modules/
+gworkspace-setup/node_modules/
+installer/__pycache__/
+installer/*.pyc
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Backup files
+*.bak
+*.clobbered.*
+
+# Logs
+*.log

@@ -1,0 +1,442 @@
+{
+  "_instructions": "Copy this file to ~/.openclaw/openclaw.json — replace ALL {{PLACEHOLDER}} values before starting OpenClaw. Run 'openclaw restart' after changes.",
+  "meta": {
+    "template": "openclaw-biz-template",
+    "version": "2.0.0",
+    "createdAt": "{{INSTALL_DATE}}"
+  },
+  "agents": {
+    "defaults": {
+      "models": {
+        "opencode-go/kimi-k2.5": { "alias": "Kimi" },
+        "opencode-go/glm-5": { "alias": "GLM" },
+        "opencode-go/minimax-m2.5": { "alias": "MiniMax" },
+        "minimax-portal/MiniMax-M2.7": { "alias": "minimax-m2.7" }
+      },
+      "compaction": {
+        "reserveTokensFloor": 50000,
+        "memoryFlush": {
+          "enabled": true,
+          "softThresholdTokens": 4000,
+          "prompt": "Review this session for architectural decisions, bug fixes, patterns, or operational rules. If found, run 'brv curate \"<concise summary>\"' to save to context tree. Also write key insights to memory/YYYY-MM-DD.md. Reply NO_REPLY if nothing significant to store.",
+          "systemPrompt": "Session nearing compaction. Store durable memories to ByteRover now."
+        },
+        "mode": "safeguard"
+      },
+      "subagents": {
+        "maxConcurrent": 4,
+        "maxSpawnDepth": 2,
+        "maxChildrenPerAgent": 3,
+        "archiveAfterMinutes": 30,
+        "model": "opencode-go/glm-5",
+        "runTimeoutSeconds": 600
+      },
+      "model": {
+        "primary": "minimax-portal/MiniMax-M2.7",
+        "fallbacks": [
+          "opencode-go/kimi-k2.5",
+          "opencode-go/glm-5",
+          "opencode-go/minimax-m2.5"
+        ]
+      }
+    },
+    "list": [
+      {
+        "id": "main",
+        "name": "main",
+        "workspace": "{{OPENCLAW_DIR}}/workspace",
+        "agentDir": "{{OPENCLAW_DIR}}/agents/main/agent",
+        "model": "minimax-portal/MiniMax-M2.7",
+        "subagents": {
+          "allowAgents": ["*"]
+        },
+        "tools": {
+          "profile": "coding",
+          "alsoAllow": ["browser", "canvas", "agents_list", "message"]
+        }
+      },
+      {
+        "id": "cowork",
+        "name": "CoWork Director",
+        "workspace": "{{OPENCLAW_DIR}}/workspace",
+        "agentDir": "{{OPENCLAW_DIR}}/agents/cowork/agent",
+        "model": "opencode-go/kimi-k2.5",
+        "subagents": {
+          "allowAgents": ["ops-desk", "content-desk", "data-desk", "code-desk", "research-desk", "memory-desk", "main"]
+        },
+        "tools": {
+          "profile": "full",
+          "alsoAllow": ["browser", "canvas", "agents_list", "message"]
+        }
+      },
+      {
+        "id": "ops-desk",
+        "name": "OpsDesk",
+        "workspace": "{{OPENCLAW_DIR}}/workspace",
+        "agentDir": "{{OPENCLAW_DIR}}/agents/cowork/desks/ops-desk/agent",
+        "model": "opencode-go/minimax-m2.5",
+        "tools": { "profile": "coding", "alsoAllow": ["message"] }
+      },
+      {
+        "id": "content-desk",
+        "name": "ContentDesk",
+        "workspace": "{{OPENCLAW_DIR}}/workspace",
+        "agentDir": "{{OPENCLAW_DIR}}/agents/cowork/desks/content-desk/agent",
+        "model": "opencode-go/glm-5",
+        "tools": { "profile": "coding", "alsoAllow": ["message", "canvas"] }
+      },
+      {
+        "id": "data-desk",
+        "name": "DataDesk",
+        "workspace": "{{OPENCLAW_DIR}}/workspace",
+        "agentDir": "{{OPENCLAW_DIR}}/agents/cowork/desks/data-desk/agent",
+        "model": "opencode-go/minimax-m2.5",
+        "tools": { "profile": "coding", "alsoAllow": ["message"] }
+      },
+      {
+        "id": "code-desk",
+        "name": "CodeDesk",
+        "workspace": "{{OPENCLAW_DIR}}/workspace",
+        "agentDir": "{{OPENCLAW_DIR}}/agents/cowork/desks/code-desk/agent",
+        "model": "opencode-go/kimi-k2.5",
+        "tools": { "profile": "full" }
+      },
+      {
+        "id": "research-desk",
+        "name": "ResearchDesk",
+        "workspace": "{{OPENCLAW_DIR}}/workspace",
+        "agentDir": "{{OPENCLAW_DIR}}/agents/cowork/desks/research-desk/agent",
+        "model": "opencode-go/glm-5",
+        "tools": { "profile": "coding", "alsoAllow": ["browser", "message"] }
+      },
+      {
+        "id": "memory-desk",
+        "name": "MemoryDesk",
+        "workspace": "{{OPENCLAW_DIR}}/workspace",
+        "agentDir": "{{OPENCLAW_DIR}}/agents/cowork/desks/memory-desk/agent",
+        "model": "opencode-go/minimax-m2.5",
+        "tools": { "profile": "coding", "alsoAllow": ["message"] }
+      },
+      {
+        "_comment": "Employer-isolated agent — uses separate workspace, never touches personal files",
+        "id": "bold-ops",
+        "name": "bold-ops",
+        "workspace": "{{OPENCLAW_DIR}}/workspace/bold-business",
+        "agentDir": "{{OPENCLAW_DIR}}/agents/bold-ops/agent",
+        "model": "opencode-go/kimi-k2.5",
+        "tools": { "profile": "full", "alsoAllow": ["browser", "message"] }
+      },
+      {
+        "_comment": "Autonomous persona agent — income, brand, outreach. Uses glm-5 for content generation.",
+        "id": "persona",
+        "name": "{{PERSONA_NAME}}",
+        "workspace": "{{OPENCLAW_DIR}}/workspace/persona",
+        "agentDir": "{{OPENCLAW_DIR}}/agents/persona/agent",
+        "model": "opencode-go/glm-5",
+        "tools": { "profile": "coding", "alsoAllow": ["browser", "message"] }
+      },
+      {
+        "_comment": "Claude API powered agent for complex multi-step tasks. COSTS MONEY — use only when free models fail.",
+        "id": "claude-automation",
+        "name": "claude-automation",
+        "workspace": "{{OPENCLAW_DIR}}/workspace",
+        "agentDir": "{{OPENCLAW_DIR}}/agents/claude-automation/agent",
+        "model": "claude-sonnet-4-6",
+        "tools": { "profile": "full" }
+      },
+      {
+        "_comment": "Claude Code CLI agent for long-running autonomous coding sessions. COSTS MONEY.",
+        "id": "claude-code-agent",
+        "name": "claude-code-agent",
+        "workspace": "{{OPENCLAW_DIR}}/workspace",
+        "agentDir": "{{OPENCLAW_DIR}}/agents/claude-code-agent/agent",
+        "model": "claude-sonnet-4-6",
+        "tools": { "profile": "coding" }
+      },
+      {
+        "_comment": "Creative sub-agents — spawned via /subagents spawn <id> — not registered as primary agents",
+        "id": "ad-copywriter", "name": "ad-copywriter",
+        "workspace": "{{OPENCLAW_DIR}}/workspace",
+        "agentDir": "{{OPENCLAW_DIR}}/agents/creative/ad-copywriter/agent",
+        "model": "opencode-go/glm-5", "tools": { "profile": "coding" }
+      },
+      {
+        "id": "brand-designer", "name": "brand-designer",
+        "workspace": "{{OPENCLAW_DIR}}/workspace",
+        "agentDir": "{{OPENCLAW_DIR}}/agents/creative/brand-designer/agent",
+        "model": "opencode-go/glm-5", "tools": { "profile": "coding" }
+      },
+      {
+        "id": "copywriter", "name": "copywriter",
+        "workspace": "{{OPENCLAW_DIR}}/workspace",
+        "agentDir": "{{OPENCLAW_DIR}}/agents/creative/copywriter/agent",
+        "model": "opencode-go/glm-5", "tools": { "profile": "coding" }
+      },
+      {
+        "id": "proofreader", "name": "proofreader",
+        "workspace": "{{OPENCLAW_DIR}}/workspace",
+        "agentDir": "{{OPENCLAW_DIR}}/agents/creative/proofreader/agent",
+        "model": "opencode-go/glm-5", "tools": { "profile": "coding" }
+      },
+      {
+        "id": "ux-researcher", "name": "ux-researcher",
+        "workspace": "{{OPENCLAW_DIR}}/workspace",
+        "agentDir": "{{OPENCLAW_DIR}}/agents/creative/ux-researcher/agent",
+        "model": "opencode-go/glm-5", "tools": { "profile": "coding", "alsoAllow": ["browser"] }
+      },
+      {
+        "id": "storyboard-writer", "name": "storyboard-writer",
+        "workspace": "{{OPENCLAW_DIR}}/workspace",
+        "agentDir": "{{OPENCLAW_DIR}}/agents/creative/storyboard-writer/agent",
+        "model": "opencode-go/glm-5", "tools": { "profile": "coding" }
+      },
+      {
+        "id": "video-scripter", "name": "video-scripter",
+        "workspace": "{{OPENCLAW_DIR}}/workspace",
+        "agentDir": "{{OPENCLAW_DIR}}/agents/creative/video-scripter/agent",
+        "model": "opencode-go/glm-5", "tools": { "profile": "coding" }
+      },
+      {
+        "id": "podcast-producer", "name": "podcast-producer",
+        "workspace": "{{OPENCLAW_DIR}}/workspace",
+        "agentDir": "{{OPENCLAW_DIR}}/agents/creative/podcast-producer/agent",
+        "model": "opencode-go/glm-5", "tools": { "profile": "coding" }
+      },
+      {
+        "id": "audio-producer", "name": "audio-producer",
+        "workspace": "{{OPENCLAW_DIR}}/workspace",
+        "agentDir": "{{OPENCLAW_DIR}}/agents/creative/audio-producer/agent",
+        "model": "opencode-go/glm-5", "tools": { "profile": "coding" }
+      },
+      {
+        "id": "thumbnail-designer", "name": "thumbnail-designer",
+        "workspace": "{{OPENCLAW_DIR}}/workspace",
+        "agentDir": "{{OPENCLAW_DIR}}/agents/creative/thumbnail-designer/agent",
+        "model": "opencode-go/glm-5", "tools": { "profile": "coding" }
+      },
+      {
+        "_comment": "Development sub-agents",
+        "id": "bug-hunter", "name": "bug-hunter",
+        "workspace": "{{OPENCLAW_DIR}}/workspace",
+        "agentDir": "{{OPENCLAW_DIR}}/agents/development/bug-hunter/agent",
+        "model": "opencode-go/kimi-k2.5", "tools": { "profile": "coding" }
+      },
+      {
+        "id": "code-reviewer", "name": "code-reviewer",
+        "workspace": "{{OPENCLAW_DIR}}/workspace",
+        "agentDir": "{{OPENCLAW_DIR}}/agents/development/code-reviewer/agent",
+        "model": "opencode-go/kimi-k2.5", "tools": { "profile": "coding" }
+      },
+      {
+        "id": "test-writer", "name": "test-writer",
+        "workspace": "{{OPENCLAW_DIR}}/workspace",
+        "agentDir": "{{OPENCLAW_DIR}}/agents/development/test-writer/agent",
+        "model": "opencode-go/kimi-k2.5", "tools": { "profile": "coding" }
+      },
+      {
+        "id": "qa-tester", "name": "qa-tester",
+        "workspace": "{{OPENCLAW_DIR}}/workspace",
+        "agentDir": "{{OPENCLAW_DIR}}/agents/development/qa-tester/agent",
+        "model": "opencode-go/minimax-m2.5", "tools": { "profile": "coding" }
+      },
+      {
+        "id": "github-pr-reviewer", "name": "github-pr-reviewer",
+        "workspace": "{{OPENCLAW_DIR}}/workspace",
+        "agentDir": "{{OPENCLAW_DIR}}/agents/development/github-pr-reviewer/agent",
+        "model": "opencode-go/kimi-k2.5", "tools": { "profile": "coding" }
+      },
+      {
+        "id": "github-issue-triager", "name": "github-issue-triager",
+        "workspace": "{{OPENCLAW_DIR}}/workspace",
+        "agentDir": "{{OPENCLAW_DIR}}/agents/development/github-issue-triager/agent",
+        "model": "opencode-go/minimax-m2.5", "tools": { "profile": "coding" }
+      },
+      {
+        "id": "pr-merger", "name": "pr-merger",
+        "workspace": "{{OPENCLAW_DIR}}/workspace",
+        "agentDir": "{{OPENCLAW_DIR}}/agents/development/pr-merger/agent",
+        "model": "opencode-go/kimi-k2.5", "tools": { "profile": "coding" }
+      },
+      {
+        "id": "api-documentation", "name": "api-documentation",
+        "workspace": "{{OPENCLAW_DIR}}/workspace",
+        "agentDir": "{{OPENCLAW_DIR}}/agents/development/api-documentation/agent",
+        "model": "opencode-go/glm-5", "tools": { "profile": "coding" }
+      },
+      {
+        "id": "api-tester", "name": "api-tester",
+        "workspace": "{{OPENCLAW_DIR}}/workspace",
+        "agentDir": "{{OPENCLAW_DIR}}/agents/development/api-tester/agent",
+        "model": "opencode-go/minimax-m2.5", "tools": { "profile": "coding" }
+      },
+      {
+        "id": "schema-designer", "name": "schema-designer",
+        "workspace": "{{OPENCLAW_DIR}}/workspace",
+        "agentDir": "{{OPENCLAW_DIR}}/agents/development/schema-designer/agent",
+        "model": "opencode-go/kimi-k2.5", "tools": { "profile": "coding" }
+      },
+      {
+        "id": "script-builder", "name": "script-builder",
+        "workspace": "{{OPENCLAW_DIR}}/workspace",
+        "agentDir": "{{OPENCLAW_DIR}}/agents/development/script-builder/agent",
+        "model": "opencode-go/kimi-k2.5", "tools": { "profile": "coding" }
+      },
+      {
+        "id": "migration-helper", "name": "migration-helper",
+        "workspace": "{{OPENCLAW_DIR}}/workspace",
+        "agentDir": "{{OPENCLAW_DIR}}/agents/development/migration-helper/agent",
+        "model": "opencode-go/kimi-k2.5", "tools": { "profile": "coding" }
+      },
+      {
+        "id": "dependency-scanner", "name": "dependency-scanner",
+        "workspace": "{{OPENCLAW_DIR}}/workspace",
+        "agentDir": "{{OPENCLAW_DIR}}/agents/development/dependency-scanner/agent",
+        "model": "opencode-go/minimax-m2.5", "tools": { "profile": "coding" }
+      },
+      {
+        "id": "changelog", "name": "changelog",
+        "workspace": "{{OPENCLAW_DIR}}/workspace",
+        "agentDir": "{{OPENCLAW_DIR}}/agents/development/changelog/agent",
+        "model": "opencode-go/glm-5", "tools": { "profile": "coding" }
+      },
+      {
+        "id": "blockchain-analyst", "name": "blockchain-analyst",
+        "workspace": "{{OPENCLAW_DIR}}/workspace",
+        "agentDir": "{{OPENCLAW_DIR}}/agents/development/blockchain-analyst/agent",
+        "model": "opencode-go/kimi-k2.5", "tools": { "profile": "coding", "alsoAllow": ["browser"] }
+      },
+      {
+        "id": "ecommerce-dev", "name": "ecommerce-dev",
+        "workspace": "{{OPENCLAW_DIR}}/workspace",
+        "agentDir": "{{OPENCLAW_DIR}}/agents/development/ecommerce-dev/agent",
+        "model": "opencode-go/kimi-k2.5", "tools": { "profile": "coding" }
+      },
+      {
+        "id": "game-designer", "name": "game-designer",
+        "workspace": "{{OPENCLAW_DIR}}/workspace",
+        "agentDir": "{{OPENCLAW_DIR}}/agents/development/game-designer/agent",
+        "model": "opencode-go/glm-5", "tools": { "profile": "coding" }
+      }
+    ]
+  },
+  "bindings": [
+    {
+      "channel": "telegram",
+      "agent": "main"
+    },
+    {
+      "_comment": "Enable this if you use Google Chat for employer workspace",
+      "channel": "googlechat",
+      "agent": "bold-ops",
+      "enabled": false
+    }
+  ],
+  "channels": {
+    "telegram": {
+      "token": "{{TELEGRAM_BOT_TOKEN}}",
+      "allowed_users": ["{{TELEGRAM_CHAT_ID}}"]
+    },
+    "googlechat": {
+      "_comment": "Only needed if using bold-ops with Google Chat",
+      "serviceAccountPath": "{{OPENCLAW_DIR}}/config/googlechat-service-account.json",
+      "audience": "{{GOOGLECHAT_AUDIENCE_URL}}",
+      "enabled": false
+    }
+  },
+  "gateway": {
+    "host": "127.0.0.1",
+    "port": 18789,
+    "protocol": "ws"
+  },
+  "mcp": {
+    "enabled": true,
+    "bridge": "mcporter",
+    "servers": {
+      "composio": {
+        "baseUrl": "https://connect.composio.dev/mcp",
+        "headers": {
+          "x-consumer-api-key": "{{COMPOSIO_API_KEY}}"
+        }
+      },
+      "supabase": {
+        "baseUrl": "https://mcp.supabase.com/mcp?project_ref={{SUPABASE_PROJECT_REF}}&features=docs,account,database,debugging,development,functions,branching,storage"
+      },
+      "github": {
+        "baseUrl": "https://api.githubcopilot.com/mcp/"
+      },
+      "Context7": {
+        "baseUrl": "https://mcp.context7.com/mcp"
+      },
+      "Playwright": {
+        "command": "npx -y @playwright/mcp@latest",
+        "args": []
+      },
+      "stripe": {
+        "baseUrl": "https://mcp.stripe.com"
+      },
+      "Railway": {
+        "command": "npx -y @railway/mcp-server",
+        "args": []
+      }
+    }
+  },
+  "plugins": {
+    "enabled": true,
+    "entries": {
+      "browser": { "enabled": true },
+      "minimax": { "enabled": true },
+      "opencode-go": {
+        "enabled": true,
+        "config": {
+          "apiKey": "{{OPENCODE_GO_API_KEY}}"
+        }
+      },
+      "memory-core": {
+        "config": {
+          "dreaming": { "enabled": true }
+        }
+      }
+    }
+  },
+  "env": {
+    "ANTHROPIC_API_KEY": "{{ANTHROPIC_API_KEY}}",
+    "OPENAI_API_KEY": "{{OPENAI_API_KEY}}",
+    "COMPOSIO_API_KEY": "{{COMPOSIO_API_KEY}}"
+  },
+  "models": {
+    "providers": {
+      "anthropic": {
+        "apiKey": "{{ANTHROPIC_API_KEY}}"
+      },
+      "google": {
+        "apiKey": "{{GOOGLE_AI_API_KEY}}"
+      }
+    }
+  },
+  "skills": {
+    "enabled": true,
+    "presets": [
+      "word-docx",
+      "excel-xlsx",
+      "powerpoint-pptx",
+      "nano-pdf",
+      "data-analysis",
+      "github",
+      "marketing-skills",
+      "memory-setup",
+      "agent-autonomy-kit"
+    ]
+  },
+  "cron": {
+    "enabled": true,
+    "timezone": "{{TIMEZONE}}",
+    "jobsFile": "{{OPENCLAW_DIR}}/cron/jobs.json"
+  },
+  "tools": {
+    "enabled": true
+  },
+  "update": {
+    "channel": "stable",
+    "autoUpdate": true
+  }
+}

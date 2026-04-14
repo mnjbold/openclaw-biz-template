@@ -1,0 +1,38 @@
+{
+  "_instructions": "Copy to ~/.openclaw/config/mcporter.json — replace {{PLACEHOLDER}} values",
+  "mcpServers": {
+    "composio": {
+      "_comment": "Composio MCP — Gmail, Drive, Calendar, LinkedIn, GitHub, Sheets, Twitter",
+      "baseUrl": "https://connect.composio.dev/mcp",
+      "headers": {
+        "x-consumer-api-key": "{{COMPOSIO_API_KEY}}"
+      }
+    },
+    "supabase": {
+      "_comment": "Supabase MCP — database, storage, edge functions, branching",
+      "baseUrl": "https://mcp.supabase.com/mcp?project_ref={{SUPABASE_PROJECT_REF}}&features=docs,account,database,debugging,development,functions,branching,storage"
+    },
+    "github": {
+      "_comment": "GitHub MCP — PRs, issues, repos, code search. Auth via GitHub token.",
+      "baseUrl": "https://api.githubcopilot.com/mcp/"
+    },
+    "Context7": {
+      "_comment": "Context7 — documentation lookup for any library/framework",
+      "baseUrl": "https://mcp.context7.com/mcp"
+    },
+    "Playwright": {
+      "_comment": "Playwright — headless browser automation and testing",
+      "command": "npx -y @playwright/mcp@latest",
+      "args": []
+    },
+    "stripe": {
+      "_comment": "Stripe MCP — payments, subscriptions, customers. Add auth token if needed.",
+      "baseUrl": "https://mcp.stripe.com"
+    },
+    "Railway": {
+      "_comment": "Railway MCP — cloud deployments",
+      "command": "npx -y @railway/mcp-server",
+      "args": []
+    }
+  }
+}
