@@ -1,6 +1,6 @@
 #!/bin/bash
 # postiz-post.sh — Post to LinkedIn via PostIz API
-# Usage: ./postiz-post.sh <draft-file> [personal|bijou|both]
+# Usage: ./postiz-post.sh <draft-file> [personal|brand|both]
 #
 # Draft file must be in workspace/drafts/linkedin-YYYY-MM-DD.md format.
 # Config loaded from workspace/config/postiz.json
@@ -29,7 +29,7 @@ fail() {
 DRAFT_FILE="${1:-}"
 TARGET="${2:-personal}"
 
-[[ -z "$DRAFT_FILE" ]] && fail "Usage: postiz-post.sh <draft-file> [personal|bijou|both]"
+[[ -z "$DRAFT_FILE" ]] && fail "Usage: postiz-post.sh <draft-file> [personal|brand|both]"
 [[ ! -f "$DRAFT_FILE" ]] && fail "Draft file not found: $DRAFT_FILE"
 [[ -f "$CONFIG_FILE" ]] || fail "PostIz config not found: $CONFIG_FILE"
 
@@ -37,7 +37,7 @@ TARGET="${2:-personal}"
 API_KEY=$(python3 -c "import json; c=json.load(open('$CONFIG_FILE')); print(c['apiKey'])")
 BASE_URL=$(python3 -c "import json; c=json.load(open('$CONFIG_FILE')); print(c['baseUrl'])")
 CHANNEL_PERSONAL=$(python3 -c "import json; c=json.load(open('$CONFIG_FILE')); print(c['channels']['personal'])")
-CHANNEL_BIJOU=$(python3 -c "import json; c=json.load(open('$CONFIG_FILE')); print(c['channels']['bijou'])")
+CHANNEL_BRAND=$(python3 -c "import json; c=json.load(open('$CONFIG_FILE')); print(c['channels']['brand'])")
 
 [[ "$API_KEY" == "POSTIZ_API_KEY_HERE" ]] && fail "PostIz API key not configured in $CONFIG_FILE"
 
@@ -118,15 +118,15 @@ case "$TARGET" in
   personal)
     RESULTS+=("$(post_to_channel "$CHANNEL_PERSONAL" "personal")")
     ;;
-  bijou)
-    RESULTS+=("$(post_to_channel "$CHANNEL_BIJOU" "bijou")")
+  brand)
+    RESULTS+=("$(post_to_channel "$CHANNEL_BRAND" "brand")")
     ;;
   both)
     RESULTS+=("$(post_to_channel "$CHANNEL_PERSONAL" "personal")")
-    RESULTS+=("$(post_to_channel "$CHANNEL_BIJOU" "bijou")")
+    RESULTS+=("$(post_to_channel "$CHANNEL_BRAND" "brand")")
     ;;
   *)
-    fail "Unknown target: $TARGET. Use personal|bijou|both"
+    fail "Unknown target: $TARGET. Use personal|brand|both"
     ;;
 esac
 

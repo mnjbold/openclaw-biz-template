@@ -1,0 +1,17 @@
+{
+  "_instructions": "Copy this to bereach.json and fill in your API key. Get your key at: https://berea.ch/account",
+  "apiKey": "brc_YOUR_API_KEY_HERE",
+  "baseUrl": "https://api.bereach.ai",
+  "_limits": {
+    "connections_per_day": 30,
+    "messages_per_day": 100,
+    "profile_visits_per_day": 350,
+    "scraping_per_day": 300,
+    "_note": "These are the defaults. Check GET /me/limits for your actual current limits."
+  },
+  "_safeTargets": {
+    "connections_per_day": 20,
+    "messages_per_day": 60,
+    "_note": "These are recommended safe targets — stay below LinkedIn's detection threshold."
+  }
+}

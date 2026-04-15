@@ -118,6 +118,15 @@
         "tools": { "profile": "coding", "alsoAllow": ["message"] }
       },
       {
+        "_comment": "LinkedIn Recruiter Automation Agent — BeReach API powered. Autonomous search, outreach, pipeline management.",
+        "id": "recruiter",
+        "name": "Recruiter",
+        "workspace": "{{OPENCLAW_DIR}}/workspace",
+        "agentDir": "{{OPENCLAW_DIR}}/agents/recruiter/agent",
+        "model": "opencode-go/kimi-k2.5",
+        "tools": { "profile": "coding", "alsoAllow": ["message"] }
+      },
+      {
         "_comment": "Employer-isolated agent — uses separate workspace, never touches personal files",
         "id": "bold-ops",
         "name": "bold-ops",

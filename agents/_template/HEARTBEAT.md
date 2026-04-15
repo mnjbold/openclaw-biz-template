@@ -8,7 +8,7 @@
 4. Verify USER.md stays within 4152 chars
 5. Scan context for recurring intent → convert to automation or files
 6. Write durable decisions immediately to appropriate file
-7. Propose cron/heartbeat rules for any recurring behavior Jewel has requested
+7. Propose cron/heartbeat rules for any recurring behavior owner has requested
 8. Check files/tools before answering factual questions — never answer from assumption
 9. Refuse fake certainty, flattery, or filler agreement
 10. If context feels bloated → distill to MEMORY.md

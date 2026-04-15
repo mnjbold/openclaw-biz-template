@@ -162,7 +162,7 @@ Manual setup is in `docs/GOOGLE-WORKSPACE.md`.
   "baseUrl": "https://api.postiz.com/public/v1",
   "channels": {
     "personal": "YOUR_LINKEDIN_PERSONAL_CHANNEL_ID",
-    "bijou": "YOUR_LINKEDIN_BRAND_CHANNEL_ID"
+    "brand": "YOUR_LINKEDIN_BRAND_CHANNEL_ID"
   }
 }
 ```
@@ -263,7 +263,7 @@ Once Telegram is connected, message your bot:
 | Any task | Main agent handles it |
 | `@cowork [task]` | Routes to CoWork team |
 | `post` | Posts latest LinkedIn draft to personal |
-| `post bijou` | Posts to brand LinkedIn |
+| `post brand` | Posts to brand LinkedIn |
 | `post both` | Posts to both |
 | `edit: [feedback]` | Revises draft, re-sends for approval |
 | `skip` | Discards draft, skips today |
@@ -278,7 +278,7 @@ The automated LinkedIn pipeline runs daily:
 ```
 09:00 MYT  →  content-desk drafts post  →  saves to workspace/drafts/
              →  Telegram: "Review your LinkedIn post for today:"
-             →  You reply: post | post bijou | post both | edit: ... | skip
+             →  You reply: post | post brand | post both | edit: ... | skip
              →  PostIz API publishes immediately
              →  Confirmation sent to Telegram
 ```
@@ -442,6 +442,69 @@ Pre-installed skills in `skills/`. See `skills/INSTALL.md` for how to install mo
 | `superdesign` | UI/UX design generation |
 | `memory-setup` | Memory system bootstrapping |
 | `agent-autonomy-kit` | Agent self-improvement patterns |
+
+---
+
+## LinkedIn Recruiter Agent (BeReach)
+
+The `recruiter` agent automates your entire LinkedIn recruitment operation using the [BeReach unofficial LinkedIn API](https://bereach.ai/unofficial-linkedin-api).
+
+**What it does autonomously:**
+- Searches for candidates by title, location, seniority, company size
+- Visits and validates profiles before outreach
+- Sends personalized connection requests (always using actual profile data)
+- Manages 4-message outreach cadences: Day 0 (connect) → Day 3 → Day 7 → Day 14
+- Monitors inbox and flags warm leads to Telegram immediately
+- Maintains pipeline in `workspace/recruiter/pipeline.json`
+- Sends weekly pipeline reports
+
+**Setup:**
+1. Get BeReach API key at [berea.ch/account](https://berea.ch/account) — free tier included
+2. Add key to `workspace/config/bereach.json`
+3. Register recruiter agent in `openclaw.json` (already in template)
+4. Enable recruiter cron jobs in `cron/jobs.json` (set `"enabled": true`)
+5. Enable: `openclaw cron run recruiter-morning-sweep`
+
+**Rate limits (confirmed live):**
+| Action | Daily | Weekly |
+|---|---|---|
+| Connection requests | 30 | 200 |
+| Messages | 100 | 400 |
+| Profile visits | 350 | 1750 |
+| Scraping/search | 300 | — |
+
+**Direct CLI usage:**
+```bash
+# Check your limits
+bash workspace/scripts/bereach.sh limits
+
+# Search candidates
+bash workspace/scripts/bereach.sh search-people \
+  --title "Senior Engineer" --location "Kuala Lumpur" --seniority "senior" --limit 20
+
+# Visit and validate a profile
+bash workspace/scripts/bereach.sh visit-profile --url "https://linkedin.com/in/username"
+
+# Send personalized connection request
+bash workspace/scripts/bereach.sh connect \
+  --url "https://linkedin.com/in/username" \
+  --message "Hi Sarah, your work at Grab on payments is impressive — let's connect."
+
+# Check inbox for replies
+bash workspace/scripts/bereach.sh inbox --limit 30
+
+# Pipeline summary
+bash workspace/scripts/bereach.sh pipeline-status
+```
+
+**Tell the agent to run a campaign:**
+```
+Search 25 Senior Backend Engineers in KL. Visit top 15 profiles, validate they have 
+3+ years experience, connect to best 12 with personalized notes based on their actual 
+work history. Check limits first, log all actions.
+```
+
+See `agents/recruiter/CAMPAIGNS.md` for campaign templates and `agents/recruiter/SOUL.md` for full agent rules.
 
 ---
 

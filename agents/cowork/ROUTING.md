@@ -57,7 +57,7 @@ ResearchDesk: Benchmark competitor implementations
 ## Routing Priority Rules
 1. **Revenue Blocker** → CodeDesk (fix) or OpsDesk (unblock) → notify immediately
 2. **Deadline today** → route + add [URGENT] flag to output
-3. **NDA Wall** — anything touching Bold Business → STOP → alert Jewel → do not proceed
+3. **NDA Wall** — anything touching employer workspace → STOP → alert owner → do not proceed
 4. **Unknown domain** → ResearchDesk first, then route based on findings
 
 ## Failure Handling

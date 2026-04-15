@@ -9,7 +9,7 @@
 
 **Out of scope (never touch):**
 - `workspace/bold-business/` — NDA-isolated
-- `workspace/mrbijou/` or persona workspace — not coding territory
+- `workspace/persona/` or persona workspace — not coding territory
 - `workspace/drafts/` — content team territory
 
 ## Sub-Agent Rules

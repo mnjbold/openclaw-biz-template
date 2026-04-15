@@ -49,7 +49,7 @@
     "timeoutSeconds": 600,
     "payload": {
       "model": "opencode-go/glm-5",
-      "message": "Route to content-desk: Draft today's LinkedIn post. Theme: professional insights, lessons learned, industry perspective. Read workspace/MEMORY.md for context about our work and personality. Save draft to workspace/drafts/linkedin-$(date +%Y-%m-%d).md using this format:\n\n---\ndate: $(date +%Y-%m-%d)\ntarget: personal\nstatus: pending\n---\n\n[Post text here — 150-300 words, conversational, authentic, no hashtag spam, max 3 relevant hashtags]\n\n---\nMEDIA BRIEF:\n- [Visual direction]\n- [Color/style]\n- [Text overlay suggestion]\n\nThen message Telegram {{TELEGRAM_CHAT_ID}}: 'Your LinkedIn draft for today is ready. Reply: post | post bijou | post both | edit: [feedback] | skip'\n\nInclude the full draft text in the Telegram message."
+      "message": "Route to content-desk: Draft today's LinkedIn post. Theme: professional insights, lessons learned, industry perspective. Read workspace/MEMORY.md for context about our work and personality. Save draft to workspace/drafts/linkedin-$(date +%Y-%m-%d).md using this format:\n\n---\ndate: $(date +%Y-%m-%d)\ntarget: personal\nstatus: pending\n---\n\n[Post text here — 150-300 words, conversational, authentic, no hashtag spam, max 3 relevant hashtags]\n\n---\nMEDIA BRIEF:\n- [Visual direction]\n- [Color/style]\n- [Text overlay suggestion]\n\nThen message Telegram {{TELEGRAM_CHAT_ID}}: 'Your LinkedIn draft for today is ready. Reply: post | post brand | post both | edit: [feedback] | skip'\n\nInclude the full draft text in the Telegram message."
     },
     "delivery": {
       "type": "announce",
@@ -156,6 +156,46 @@
     "payload": {
       "model": "opencode-go/minimax-m2.5",
       "message": "Morning employer workspace brief. Check workspace/bold-business/OPERATIONS.md. Report today's employer priorities. Send to Telegram {{TELEGRAM_CHAT_ID}}."
+    },
+    "delivery": {
+      "type": "announce",
+      "channel": "telegram",
+      "target": "{{TELEGRAM_CHAT_ID}}"
+    }
+  },
+  {
+    "_comment": "Enable to run autonomous LinkedIn recruiting morning sweep",
+    "id": "recruiter-morning-sweep",
+    "name": "LinkedIn Recruiter Morning Sweep",
+    "enabled": false,
+    "schedule": "0 8 * * 1-5",
+    "agent": "recruiter",
+    "sessionTarget": "isolated",
+    "sessionKey": "recruiter-daily",
+    "timeoutSeconds": 1800,
+    "payload": {
+      "model": "opencode-go/kimi-k2.5",
+      "message": "Run the recruiter morning sweep.\n1. Check BeReach limits: bash workspace/scripts/bereach.sh limits\n2. Check inbox for replies — flag any as WARM in pipeline, alert owner via Telegram for each reply\n3. Check pipeline for candidates due Day 3/7/14 follow-up (compare connectionSentAt/lastMessageAt to today)\n4. Send due follow-up messages (respect 5s intervals, stay under 60 messages today)\n5. If connections remaining > 15: search 30 new candidates for the active campaign, visit top 20, connect to best 15 with personalized notes based on their actual profile data\n6. Add all new candidates to pipeline.json\n7. Send daily summary to Telegram {{TELEGRAM_CHAT_ID}}: connections sent, messages sent, warm leads, pipeline total"
+    },
+    "delivery": {
+      "type": "announce",
+      "channel": "telegram",
+      "target": "{{TELEGRAM_CHAT_ID}}"
+    }
+  },
+  {
+    "_comment": "Enable for weekly recruiter pipeline report",
+    "id": "recruiter-weekly-report",
+    "name": "Recruiter Weekly Pipeline Report",
+    "enabled": false,
+    "schedule": "0 9 * * 1",
+    "agent": "recruiter",
+    "sessionTarget": "isolated",
+    "sessionKey": "recruiter-weekly",
+    "timeoutSeconds": 300,
+    "payload": {
+      "model": "opencode-go/minimax-m2.5",
+      "message": "Generate weekly recruiter report. Read workspace/recruiter/logs/ for the past 7 days. Report: total outreach, connection acceptance rate, reply rate, warm leads, meetings booked. Send formatted table to Telegram {{TELEGRAM_CHAT_ID}}."
     },
     "delivery": {
       "type": "announce",

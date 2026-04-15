@@ -152,8 +152,8 @@ prompt YOUR_HANDLE      "Your handle/username (no @)" "alex"
 prompt YOUR_COMPANY     "Company or project name" "MyCompany"
 prompt YOUR_EMAIL       "Your email address"
 prompt YOUR_TIMEZONE    "Timezone (e.g., Asia/Kuala_Lumpur, America/New_York)" "UTC"
-prompt AGENT_NAME       "Name for your main agent (e.g., Luffy, Atlas, Nova)" "Atlas"
-prompt PERSONA_NAME     "Name for your autonomous persona agent (e.g., MR BIJOU)" "BIJOU"
+prompt AGENT_NAME       "Name for your main agent (e.g., Atlas, Sage, Vance, Nova)" "Atlas"
+prompt PERSONA_NAME     "Name for your autonomous persona agent (e.g., MR NOVA, MAX, ACE)" "NOVA"
 
 echo ""
 info "Identity configured:"
@@ -395,7 +395,7 @@ cat > "$POSTIZ_CONFIG" << POSTIZ_EOF
   "baseUrl": "https://api.postiz.com/public/v1",
   "channels": {
     "personal": "${POSTIZ_PERSONAL_CHANNEL:-LINKEDIN_PERSONAL_CHANNEL_ID}",
-    "bijou": "${POSTIZ_BRAND_CHANNEL:-LINKEDIN_BRAND_CHANNEL_ID}"
+    "brand": "${POSTIZ_BRAND_CHANNEL:-LINKEDIN_BRAND_CHANNEL_ID}"
   },
   "_setup": {
     "step1": "Get API key: app.postiz.com → Settings → API",
