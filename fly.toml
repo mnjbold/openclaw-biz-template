@@ -2,15 +2,15 @@
 # Bold Business - OpenClaw Enterprise Multi-Agent
 # Fly.io Deployment Configuration
 #
-# Architecture:
-#   - OpenClaw Gateway (port 3000) - Main WebSocket/HTTP gateway
-#   - FastAPI Dashboard (port 8181) - Web management UI
-#   - Computer Use: Xvfb + Chromium + Fluxbox
+# Services running inside one machine (via entrypoint.sh):
+#   - OpenClaw Gateway (port 3000, main HTTP/WS endpoint)
+#   - FastAPI Dashboard (port 8181, internal)
+#   - Xvfb + Chromium for Computer Use capability
 #   - 14+ specialist agents loaded from /data/openclaw
-#   - Persistent 20GB volume for all state, workspaces, logs
 #
 # Machine: performance-2x (4 vCPU, 8GB RAM)
 # Region: sin (Singapore - closest to KL)
+# Volume: 20GB persistent storage at /data
 # =============================================================
 
 app = "bold-openclaw-enterprise"
@@ -29,77 +29,37 @@ primary_region = "sin"
   PYTHONUNBUFFERED = "1"
   DASHBOARD_PORT = "8181"
   GATEWAY_PORT = "3000"
-  # Allow future agents: claude-code, database, etc.
   ENABLE_VNC = "false"
-  # Computer Use - Chromium flags for containerized env
   CHROMIUM_FLAGS = "--no-sandbox --disable-dev-shm-usage --disable-gpu"
-  # Multi-agent: allow up to 20 concurrent agents
   OPENCLAW_MAX_AGENTS = "20"
-  # Workspace base path
   OPENCLAW_WORKSPACES_DIR = "/data/workspaces"
-  # Logs
   OPENCLAW_LOG_DIR = "/data/logs"
 
-# ---- Processes ----
-[processes]
-  # Main: supervisor manages all sub-processes
-  # (Xvfb, Fluxbox, Dashboard, OpenClaw gateway)
-  app = "/entrypoint.sh"
-
-# ---- Primary HTTP service (OpenClaw Gateway) ----
+# ---- Primary HTTP service (OpenClaw Gateway on port 3000) ----
 [http_service]
   internal_port = 3000
   force_https = true
   auto_stop_machines = false
   auto_start_machines = true
   min_machines_running = 1
-  processes = ["app"]
 
-  # WebSocket support (required for OpenClaw gateway protocol)
   [http_service.concurrency]
     type = "connections"
     hard_limit = 500
     soft_limit = 400
 
-# ---- Dashboard service (FastAPI) ----
-[[services]]
-  protocol = "tcp"
-  internal_port = 8181
-  processes = ["app"]
-
-  [[services.ports]]
-    port = 8181
-    handlers = ["tls", "http"]
-
-  [services.concurrency]
-    type = "requests"
-    hard_limit = 100
-    soft_limit = 80
-
-# ---- VM sizing ----
-# performance-2x: 4 vCPU, 8GB RAM
-# Sufficient for: 14 agents + Computer Use + Dashboard + Claude Code
+# ---- VM sizing: performance-2x = 4 vCPU, 8GB RAM ----
+# Supports: 14 agents + Computer Use + Dashboard + Claude Code
 [[vm]]
   size = "performance-2x"
   memory = "8192mb"
 
-# ---- Persistent storage ----
-# All state: openclaw.json, agent workspaces, memory, logs, DB
+# ---- Persistent volume: 20GB ----
+# Stores: openclaw state, agent workspaces, memory, logs
 [mounts]
   source = "bold_openclaw_data"
   destination = "/data"
   initial_size = "20gb"
-
-# ---- Health checks ----
-[[checks]]
-  name = "gateway_alive"
-  port = 3000
-  type = "http"
-  interval = "30s"
-  timeout = "10s"
-  grace_period = "60s"
-  method = "GET"
-  path = "/health"
 
 # ---- Metrics ----
 [metrics]
